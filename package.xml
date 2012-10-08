@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE package SYSTEM "http://pear.php.net/dtd/package-1.0">
+<package>
+
+  <name>eject</name>
+  <summary>eject binding for PHP</summary>
+  <description>
+eject support for PHP
+  </description>
+
+  <license>PHP</license>
+
+  <maintainers>
+    <maintainer>
+      <user>oasynnoum</user>
+      <name>Keng-ichi Ahagon</name>
+      <email>k.ahagon@n-3.so</email>
+      <role>lead</role>
+    </maintainer>
+  </maintainers>
+
+  <release>
+    <version>0.0.1</version>
+    <state>alpha</state>
+    <notes>- Initial release.
+</notes>
+    <date>2012-10-08</date>
+  </release>
+  <changelog>
+
+  </changelog>
+  <deps>
+    <dep type="php" rel="ge" version="4.0.0"/>
+  </deps>
+
+  <filelist>
+    <dir name="/">
+      <file role='doc' name='EXPERIMENTAL'/>
+      <file role='doc' name='CREDITS'/>
+      <file role='src' name='config.m4'/>
+      <file role='src' name='eject.dsp'/>
+      <file role='src' name='config.w32'/>
+      <file role='src' name='eject.c'/>
+      <file role='src' name='php_eject.h'/>
+      <dir name="tests">
+        <file role='test' name='eject_close_tray.phpt'/>
+        <file role='test' name='eject_toggle_tray.phpt'/>
+      </dir>
+    </dir>
+  </filelist>
+</package>

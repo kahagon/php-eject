@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension name="eject" version="0.0.1">
+  <summary>eject binding for PHP</summary>
+  <description><?data
+eject support for PHP
+  ?></description>
+
+  <maintainers>
+    <maintainer>
+      <user>oasynnoum</user>
+      <name>Keng-ichi Ahagon</name>
+      <email>k.ahagon@n-3.so</email>
+      <role>lead</role>
+    </maintainer>
+  </maintainers>
+
+  <license>PHP</license>
+
+  <release>
+    <version>0.0.1</version>
+    <date>2012-10-08</date>
+    <state>alpha</state>
+    <notes><?data
+- Initial release.
+    ?></notes>
+  </release>
+
+  <function name="eject_close_tray" role="public">
+    <proto>bool eject_close_tray(string device [, bool use_proc_mount])</proto>
+  </function>
+  <function name="eject_toggle_tray" role="public">
+    <proto>bool eject_toggle_tray(string device [, bool use_proc_mount])</proto>
+  </function>
+</extension>

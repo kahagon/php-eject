@@ -1,0 +1,7 @@
+<!ENTITY reference.eject.reference SYSTEM './eject/reference.xml'>
+<!ENTITY reference.eject.constants SYSTEM './eject/constants.xml'>
+<!ENTITY reference.eject.ini SYSTEM './eject/ini.xml'>
+<!ENTITY reference.eject.configure SYSTEM './eject/configure.xml'>
+<!ENTITY reference.eject.functions.eject-close-tray SYSTEM './eject/functions/eject-close-tray.xml'>
+<!ENTITY reference.eject.functions.eject-toggle-tray SYSTEM './eject/functions/eject-toggle-tray.xml'>
+<!ENTITY reference.eject.functions SYSTEM './functions.xml'>

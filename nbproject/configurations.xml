@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="84">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df name="php-eject" root=".">
+      <df name="autom4te.cache">
+      </df>
+      <df name="build">
+      </df>
+      <df name="include">
+      </df>
+      <df name="manual">
+        <df name="eject">
+          <df name="functions">
+          </df>
+        </df>
+      </df>
+      <df name="modules">
+      </df>
+      <df name="tests">
+      </df>
+      <in>config.h</in>
+      <in>eject.c</in>
+      <in>php_eject.h</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="重要なファイル"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+      <itemPath>configure</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath></executablePath>
+          <cTool>
+            <incDir>
+              <pElem>/usr/include/php5/Zend</pElem>
+              <pElem>/usr/include/php5/ext</pElem>
+              <pElem>/usr/include/php5</pElem>
+              <pElem>.</pElem>
+              <pElem>/usr/include/php5/main</pElem>
+              <pElem>/usr/include/php5/TSRM</pElem>
+              <pElem>/usr/include/php5/ext/date/lib</pElem>
+              <pElem>include</pElem>
+              <pElem>main</pElem>
+            </incDir>
+            <preprocessorList>
+              <Elem>HAVE_CONFIG_H</Elem>
+              <Elem>PHP_ATOM_INC</Elem>
+              <Elem>PIC</Elem>
+              <Elem>_FILE_OFFSET_BITS=64</Elem>
+              <Elem>_LARGEFILE_SOURCE</Elem>
+            </preprocessorList>
+          </cTool>
+        </makeTool>
+      </makefileType>
+    </conf>
+  </confs>
+</configurationDescriptor>
