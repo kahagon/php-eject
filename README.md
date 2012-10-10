@@ -1,70 +1,49 @@
-This is a standalone PHP extension created using CodeGen_PECL 1.1.3
-
-HACKING
-=======
-
-There are two ways to modify an extension created using CodeGen_PECL:
-
-1) you can modify the generated code as with any other PHP extension
-  
-2) you can add custom code to the CodeGen_PECL XML source and re-run pecl-gen
-
-The 2nd approach may look a bit complicated but you have be aware that any
-manual changes to the generated code will be lost if you ever change the
-XML specs and re-run PECL-Gen. All changes done before have to be applied
-to the newly generated code again.
-Adding code snippets to the XML source itself on the other hand may be a 
-bit more complicated but this way your custom code will always be in the
-generated code no matter how often you rerun CodeGen_PECL.
-
-
-BUILDING ON UNIX etc.
+php-eject
 =====================
 
-To compile your new extension, you will have to execute the following steps:
+使い方
+---------------------
 
-1.  $ ./phpize
-2.  $ ./configure [--enable--eject] 
-3.  $ make
-4.  $ make test
-5.  $ [sudo] make install
-
-
-
-BUILDING ON WINDOWS
-===================
-
-The extension provides the VisualStudio V6 project file 
-
-  eject.dsp
-To compile the extension you open this file using VisualStudio,
-select the apropriate configuration for your installation
-(either "Release_TS" or "Debug_TS") and create "php_eject.dll"
-
-After successfull compilation you have to copy the newly
-created "eject.dll" to the PHP
-extension directory (default: C:\PHP\extensions).
+    $ php -a
+    Interactive shell
+    
+    php > eject_toggle_tray("cdrom");
+    php > eject_close_tray("cdrom");
 
 
-TESTING
-=======
+能書き
+---------------------
+[Ejectコマンドユーザー会](http://eject.kokuda.org/)を見つけて徹夜明けのどうしようもないテンションで作りました。  
+Ejectコマンドユーザー会の [GitHub リポジトリ](https://github.com/Akkiesoft/Eject-Command-Users-Group/) を眺めていると eject は以下のように行われていました。  
+[Eject-Command-Users-Group/minimum-sample.php](https://github.com/Akkiesoft/Eject-Command-Users-Group/blob/14fd8b020812182a3156dcade6dcdb84b872ddab/minimum-sample.php#L4)
 
-You can now load the extension using a php.ini directive
+    exec('/usr/sbin/eject -T /dev/sr0');
 
-  extension="eject.[so|dll]"
+実装方法としてはとってリ早い exec のコール。しかし、 PHP の exec の実装は popen(3) を用いています。  
+github [php-src/TSRM/tsrm_virtual_cwd.h](https://github.com/php/php-src/blob/8775a37559caa67b2b8d5ede02cde2bac2f974e0/TSRM/tsrm_virtual_cwd.h#L311)  
+このため、内部的に eject を実装するのに比べ、いくらかオーバーヘッドが生じます。  
+man popen(3) によると、
 
-or load it at runtime using the dl() function
+> FILE *popen(const char *command, const char *type);  
+> （中略）  
+> popen() 関数は、プロセスをオープンする。具体的には、パイプを生成し、フォークを行い、 シェルを起動する。
 
-  dl("eject.[so|dll]");
+とあります。つまり、「パイプを生成し、フォークを行い、 シェルを起動」というあたりがオーバーヘッドになり、
+大規模な eject サービスではこれがボトルネックになりうると考えられます。
+そこで eject を PHP に組み込もうと考えるに至りました。
+php-eject の実装はシンプルで、ほとんどが eject(1) の実装をパクリ、元い、コピペしたものです。
 
-The extension should now be available, you can test this
-using the extension_loaded() function:
+Unix-likeなOSでのビルド・インストール
+---------------------
 
-  if (extension_loaded("eject"))
-    echo "eject loaded :)";
-  else
-    echo "something is wrong :(";
+    $ ./phpize
+    $ ./configure [--enable--eject] 
+    $ make
+    $ make test
+    $ [sudo] make install
 
-The extension will also add its own block to the output
-of phpinfo();
 
+Windows
+---------------------
+現在対応していません。
+時間見つけて対応できたらいいなとは思っています。
