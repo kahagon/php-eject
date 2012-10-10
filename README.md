@@ -36,7 +36,7 @@ php-eject の実装はシンプルで、ほとんどが eject(1) の実装をパ
 Unix-likeなOSでのビルド・インストール
 ---------------------
 
-    $ ./phpize
+    $ phpize
     $ ./configure [--enable--eject] 
     $ make
     $ make test
