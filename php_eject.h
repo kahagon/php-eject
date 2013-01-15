@@ -26,10 +26,14 @@ extern "C" {
 #endif
 
 #include <stdlib.h>
+#include <php.h>
+#ifdef PHP_WIN32
+
+#else
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/cdrom.h>
-#include <php.h>
+#endif
 
 #ifdef HAVE_EJECT
 #define PHP_EJECT_VERSION "0.0.1"

@@ -2,7 +2,7 @@ dnl
 dnl $ Id: $
 dnl
 
-PHP_ARG_ENABLE(eject, whether to enable eject functions,
+PHP_ARG_ENABLE(Eject, whether to enable eject functions,
 [  --enable-eject         Enable eject support])
 
 if test "$PHP_EJECT" != "no"; then
@@ -24,7 +24,7 @@ if test "$PHP_EJECT" != "no"; then
   PHP_SUBST(EJECT_SHARED_LIBADD)
   AC_DEFINE(HAVE_EJECT, 1, [ ])
 
-  PHP_NEW_EXTENSION(eject, eject.c , $ext_shared)
+  PHP_NEW_EXTENSION(Eject, eject.c , $ext_shared)
 
 fi
 

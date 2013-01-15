@@ -106,7 +106,7 @@ PHP_MINFO_FUNCTION(eject)
 /* }}} */
 
 #define FCLOSE(fd) if (fclose(fd)==-1) { \
-    php_error_docref(NULL TSRMLS_CC, E_ERROR, "Unable to close FILE pointer."); \
+    php_error(E_ERROR, "Unable to close FILE pointer."); \
 }
 
 /* Used by the ToggleTray() function. If ejecting the tray takes this
@@ -117,6 +117,10 @@ PHP_MINFO_FUNCTION(eject)
 
 #define EJECT_COMMAND_CLOSE 0
 #define EJECT_COMMAND_TOGGLE 1
+
+#ifdef PHP_WIN32
+
+#else
 
 /* Return 1 if file/device exists, 0 otherwise. */
 static int FileExists(const char *name)
@@ -156,7 +160,7 @@ static char *FindDevice(const char *name)
 
 	buf = (char *) emalloc(strlen(name)+14); /* to allow for "/dev/cdroms/ + "0" + null */
 	if (buf==NULL) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "could not allocate memory\n");
+		php_error(E_WARNING, "could not allocate memory\n");
 		return NULL;
 	}
 	if ((name[0] == '.') || (name[0] == '/')) {
@@ -289,7 +293,7 @@ static int MountedDevice(const char *name, char **mountName, char **deviceName, 
 	fp = fopen((p_option ? "/proc/mounts" : "/etc/mtab"), "r");
 	if (fp == NULL)
 	{
-            php_error_docref(NULL TSRMLS_CC, E_WARNING, "unable to open %s: %s\n", (p_option ? "/proc/mounts" : "/etc/mtab"), strerror(errno));
+            php_error(E_WARNING, "unable to open %s: %s\n", (p_option ? "/proc/mounts" : "/etc/mtab"), strerror(errno));
             return 0;
 	}
 
@@ -365,13 +369,13 @@ static int CloseTray(int fd)
 #ifdef CDROMCLOSETRAY
 	status = ioctl(fd, CDROMCLOSETRAY);
 	if (status != 0) {
-            php_error_docref(NULL TSRMLS_CC, E_WARNING, "CD-ROM tray close command failed: %s\n", strerror(errno));
+            php_error(E_WARNING, "CD-ROM tray close command failed: %s\n", strerror(errno));
             return 0;
 	} else {
             return 1;
         }
 #else
-        php_error_docref(NULL TSRMLS_CC, E_WARNING, "CD-ROM tray close command not supported by this kernel\n");
+        php_error(E_WARNING, "CD-ROM tray close command not supported by this kernel\n");
         return 0;
 #endif
 }
@@ -425,12 +429,18 @@ static int ToggleTray(int fd)
 
 #else
     return 0;
-    php_error_docref(NULL TSRMLS_CC, E_WARNING, stderr, "CD-ROM tray toggle command not supported by this kernel\n");
+    php_error(E_WARNING, "CD-ROM tray toggle command not supported by this kernel\n");
 #endif
 	
 }
+#endif /* PHP_WIN32 */
 
 static int eject_impl(const char *_device, int device_len, int command, zend_bool use_proc_mount) {
+    int status = 0;
+#ifdef PHP_WIN32
+    php_error(E_WARNING, "not implemented yet\n");
+    return 0;
+#else
     char *fullName;    /* expanded name */
     int ld = 6;	   /* symbolic link max depth */
     char *linkName;    /* name of device's symbolic link */
@@ -438,12 +448,11 @@ static int eject_impl(const char *_device, int device_len, int command, zend_boo
     char *mountName;   /* name of device's mount point */
     char *deviceName;  /* name of device */
     int mountable = 0; /* true if device is in /etc/fstab */
-    int fd; 	   /* file descriptor for device */
-    int status = 0;
+    int fd; 	   /* file descriptor for device */\
     
     char *device = estrdup(_device);
     if (!device) {
-        php_error_docref(NULL TSRMLS_CC, E_ERROR, "failed to allocate memory.\n");
+        php_error(E_ERROR, "failed to allocate memory.\n");
         return 0;
     }
     
@@ -455,7 +464,7 @@ static int eject_impl(const char *_device, int device_len, int command, zend_boo
     /* figure out full device or mount point name */
     fullName = FindDevice(device);
     if (!fullName) {
-            php_error_docref(NULL TSRMLS_CC, E_WARNING, "unable to find or open device for: `%s'\n", device);
+            php_error(E_WARNING, "unable to find or open device for: `%s'\n", device);
             return 0;
     }
     
@@ -469,7 +478,7 @@ static int eject_impl(const char *_device, int device_len, int command, zend_boo
     }
     /* handle max depth exceeded option */
     if (ld <= 0) {
-            php_error_docref(NULL TSRMLS_CC, E_WARNING, "maximum symbolic link depth exceeded: `%s'\n", fullName);
+            php_error(E_WARNING, "maximum symbolic link depth exceeded: `%s'\n", fullName);
             return 0;
     }
     
@@ -488,7 +497,7 @@ static int eject_impl(const char *_device, int device_len, int command, zend_boo
         case EJECT_COMMAND_CLOSE:
             fd = OpenDevice(deviceName);
             if (fd == -1) {
-                php_error_docref(NULL TSRMLS_CC, E_WARNING, "unable to open `%s'\n", fullName);
+                php_error(E_WARNING, "unable to open `%s'\n", fullName);
                 return 0;
             } else {
                 status = CloseTray(fd);
@@ -497,7 +506,7 @@ static int eject_impl(const char *_device, int device_len, int command, zend_boo
         case EJECT_COMMAND_TOGGLE:
             fd = OpenDevice(deviceName);
             if (fd == -1) {
-                php_error_docref(NULL TSRMLS_CC, E_WARNING, "unable to open `%s'\n", fullName);
+                php_error(E_WARNING, "unable to open `%s'\n", fullName);
                 status = 0;
             } else {
                 status = ToggleTray(fd);
@@ -511,6 +520,7 @@ static int eject_impl(const char *_device, int device_len, int command, zend_boo
     if (mountName) efree(mountName);
     if (deviceName) efree(deviceName);
     return status;
+#endif /* PHP_WIN32 */
 }
 
 /* {{{ proto bool eject_close_tray(string device [, bool use_proc_mount])

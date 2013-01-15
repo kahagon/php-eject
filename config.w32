@@ -1,0 +1,11 @@
+// $ Id: $
+// vim:ft=javascript
+
+ARG_ENABLE('eject' , 'Eject API for PHP', 'no');
+if (PHP_EJECT == "yes") {
+  EXTENSION("Eject", "eject.c");
+  AC_DEFINE("HAVE_EJECT", 1, "Eject support");
+  ADD_FLAG("CFLAGS_EJECT", " \
+    /D HAVE_EJECT \
+  ");
+}
