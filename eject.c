@@ -438,8 +438,63 @@ static int ToggleTray(int fd)
 static int eject_impl(const char *_device, int device_len, int command, zend_bool use_proc_mount) {
     int status = 0;
 #ifdef PHP_WIN32
-    php_error(E_WARNING, "not implemented yet\n");
-    return 0;
+	TCHAR device[128];
+	HANDLE handle;
+	DWORD bytesReturned;
+	BOOL result;
+	LPVOID lpMsgBuf;
+	
+	
+	_stprintf_s(device, sizeof(device)/sizeof(TCHAR), _T("%s"), _device);
+	handle = CreateFile(device, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (handle == INVALID_HANDLE_VALUE) {
+		php_error(E_ERROR, "failed to open device\n");
+		return 0;
+	}
+	
+    switch (command) {
+        case EJECT_COMMAND_CLOSE:
+			bytesReturned = 0;
+			result = DeviceIoControl(
+				handle,
+				IOCTL_STORAGE_LOAD_MEDIA,
+				NULL,
+				0,
+				NULL,
+				0,
+				&bytesReturned,
+				NULL);
+			if (!result) {
+				
+				DWORD dw = GetLastError(); 
+				
+				FormatMessage(
+					FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+					FORMAT_MESSAGE_FROM_SYSTEM |
+					FORMAT_MESSAGE_IGNORE_INSERTS,
+					NULL,
+					dw,
+					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+					(LPTSTR) &lpMsgBuf,
+					0, NULL );
+				_tprintf(TEXT("%d, %s"), dw, lpMsgBuf);
+				php_error(E_ERROR, "%d, %s", dw, lpMsgBuf);
+				LocalFree(lpMsgBuf);
+			}
+			status = result;
+            break;
+        case EJECT_COMMAND_TOGGLE:
+        	php_error(E_ERROR, "not implemented yet\n");
+        	status = 0;
+            break;
+        default:
+            status = 0;
+            break;
+    }
+	
+	CloseHandle(handle);
+	//*/
+    return 1;
 #else
     char *fullName;    /* expanded name */
     int ld = 6;	   /* symbolic link max depth */

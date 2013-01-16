@@ -29,6 +29,13 @@ extern "C" {
 #include <php.h>
 #ifdef PHP_WIN32
 
+#include <Windows.h>
+#include <stdio.h>
+#include <tchar.h>
+#include <winioctl.h>
+#include <stdio.h>
+#include <locale.h>
+
 #else
 #include <fcntl.h>
 #include <sys/ioctl.h>
