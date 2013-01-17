@@ -359,13 +359,52 @@ static int OpenDevice(const char *fullName)
 	return fd;
 }
 
+#endif /* PHP_WIN32 */
+
 /*
  * Close tray. Not supported by older kernels.
  */
+#ifdef PHP_WIN32
+static int CloseTray(HANDLE fd)
+#else
 static int CloseTray(int fd)
+#endif
 {
 	int status;
+#ifdef PHP_WIN32
+	DWORD bytesReturned;
+	BOOL result;
+	LPVOID lpMsgBuf;
 
+	bytesReturned = 0;
+	result = DeviceIoControl(
+		fd,
+		IOCTL_STORAGE_LOAD_MEDIA,
+		NULL,
+		0,
+		NULL,
+		0,
+		&bytesReturned,
+		NULL);
+	if (!result) {
+		
+		DWORD dw = GetLastError(); 
+		
+		FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			dw,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR) &lpMsgBuf,
+			0, NULL );
+		_tprintf(TEXT("%d, %s"), dw, lpMsgBuf);
+		php_error(E_ERROR, "%d, %s", dw, lpMsgBuf);
+		LocalFree(lpMsgBuf);
+	}
+	return result ? 1 : 0;
+#else
 #ifdef CDROMCLOSETRAY
 	status = ioctl(fd, CDROMCLOSETRAY);
 	if (status != 0) {
@@ -377,7 +416,8 @@ static int CloseTray(int fd)
 #else
         php_error(E_WARNING, "CD-ROM tray close command not supported by this kernel\n");
         return 0;
-#endif
+#endif /* CDROMCLOSETRAY */
+#endif /* PHP_WIN32 */
 }
 
 
@@ -391,12 +431,21 @@ static int CloseTray(int fd)
  * CloseTray().
  *
  */
+#ifdef PHP_WIN32
+static int ToggleTray(HANDLE fd)
+#else
 static int ToggleTray(int fd)
+#endif
 {
 	struct timeval time_start, time_stop;
 	int time_elapsed;
 
-#ifdef CDROMCLOSETRAY
+#ifdef PHP_WIN32
+	DWORD bytesReturned;
+	BOOL result;
+	LPVOID lpMsgBuf;
+#endif
+
 
 	/* Try to open the CDROM tray and measure the time therefor
 	 * needed.  In my experience the function needs less than 0.05
@@ -404,11 +453,44 @@ static int ToggleTray(int fd)
 	 * if it was closed.  */
 	gettimeofday(&time_start, NULL);
 	
+#ifdef PHP_WIN32
+
+	bytesReturned = 0;
+	result = DeviceIoControl(
+		fd,
+		IOCTL_STORAGE_EJECT_MEDIA,
+		NULL,
+		0,
+		NULL,
+		0,
+		&bytesReturned,
+		NULL);
+	if (!result) {
+		
+		DWORD dw = GetLastError(); 
+		
+		FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			dw,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR) &lpMsgBuf,
+			0, NULL );
+		_tprintf(TEXT("%d, %s"), dw, lpMsgBuf);
+		php_error(E_ERROR, "%d, %s", dw, lpMsgBuf);
+		LocalFree(lpMsgBuf);
+		return 0;
+	}
+
+#else
 	/* Send the CDROMEJECT command to the device. */
 	if (ioctl(fd, CDROMEJECT, 0) < 0) {
 		perror("ioctl");
 		return 0;
 	}
+#endif /* PHP_WIN32 */
 
 	/* Get the second timestamp, to measure the time needed to open
 	 * the tray.  */
@@ -425,76 +507,21 @@ static int ToggleTray(int fd)
         } else {
             return 1;
         }
-		
-
-#else
-    return 0;
-    php_error(E_WARNING, "CD-ROM tray toggle command not supported by this kernel\n");
-#endif
-	
 }
-#endif /* PHP_WIN32 */
 
 static int eject_impl(const char *_device, int device_len, int command, zend_bool use_proc_mount) {
     int status = 0;
 #ifdef PHP_WIN32
 	TCHAR device[128];
-	HANDLE handle;
-	DWORD bytesReturned;
-	BOOL result;
-	LPVOID lpMsgBuf;
-	
+	HANDLE fd;
 	
 	_stprintf_s(device, sizeof(device)/sizeof(TCHAR), _T("%s"), _device);
-	handle = CreateFile(device, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (handle == INVALID_HANDLE_VALUE) {
+	fd = CreateFile(device, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	if (fd == INVALID_HANDLE_VALUE) {
 		php_error(E_ERROR, "failed to open device\n");
 		return 0;
 	}
 	
-    switch (command) {
-        case EJECT_COMMAND_CLOSE:
-			bytesReturned = 0;
-			result = DeviceIoControl(
-				handle,
-				IOCTL_STORAGE_LOAD_MEDIA,
-				NULL,
-				0,
-				NULL,
-				0,
-				&bytesReturned,
-				NULL);
-			if (!result) {
-				
-				DWORD dw = GetLastError(); 
-				
-				FormatMessage(
-					FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-					FORMAT_MESSAGE_FROM_SYSTEM |
-					FORMAT_MESSAGE_IGNORE_INSERTS,
-					NULL,
-					dw,
-					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-					(LPTSTR) &lpMsgBuf,
-					0, NULL );
-				_tprintf(TEXT("%d, %s"), dw, lpMsgBuf);
-				php_error(E_ERROR, "%d, %s", dw, lpMsgBuf);
-				LocalFree(lpMsgBuf);
-			}
-			status = result;
-            break;
-        case EJECT_COMMAND_TOGGLE:
-        	php_error(E_ERROR, "not implemented yet\n");
-        	status = 0;
-            break;
-        default:
-            status = 0;
-            break;
-    }
-	
-	CloseHandle(handle);
-	//*/
-    return 1;
 #else
     char *fullName;    /* expanded name */
     int ld = 6;	   /* symbolic link max depth */
@@ -548,34 +575,32 @@ static int eject_impl(const char *_device, int device_len, int command, zend_boo
             mountable = MountableDevice(fullName, &mountName, &deviceName);
     }
     
+    fd = OpenDevice(deviceName);
+    if (fd == -1) {
+        php_error(E_WARNING, "unable to open `%s'\n", fullName);
+        return 0;
+    }
+#endif /* PHP_WIN32 */
+    
     switch (command) {
         case EJECT_COMMAND_CLOSE:
-            fd = OpenDevice(deviceName);
-            if (fd == -1) {
-                php_error(E_WARNING, "unable to open `%s'\n", fullName);
-                return 0;
-            } else {
-                status = CloseTray(fd);
-            }
+            status = CloseTray(fd);
             break;
         case EJECT_COMMAND_TOGGLE:
-            fd = OpenDevice(deviceName);
-            if (fd == -1) {
-                php_error(E_WARNING, "unable to open `%s'\n", fullName);
-                status = 0;
-            } else {
-                status = ToggleTray(fd);
-            }
+            status = ToggleTray(fd);
             break;
         default:
             status = 0;
             break;
     }
     
+#ifdef PHP_WIN32
+	if (fd != INVALID_HANDLE_VALUE) CloseHandle(fd);
+#else    
     if (mountName) efree(mountName);
     if (deviceName) efree(deviceName);
-    return status;
 #endif /* PHP_WIN32 */
+    return status;
 }
 
 /* {{{ proto bool eject_close_tray(string device [, bool use_proc_mount])

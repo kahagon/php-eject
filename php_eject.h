@@ -35,7 +35,7 @@ extern "C" {
 #include <winioctl.h>
 #include <stdio.h>
 #include <locale.h>
-
+#include <Winsock2.h>
 #else
 #include <fcntl.h>
 #include <sys/ioctl.h>
