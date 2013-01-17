@@ -52,3 +52,7 @@ Windows
 php_Eject.dll を、お使いの PHP の extension_dir にインストールし、以下の行を php.ini に追加してください。
 
     extension=php_Eject.dll
+
+コマンドラインから次のように Eject できます。この例では E ドライブを用いています。
+
+    php -r 'eject_toggle_tray("\\\\.\\E:");'
