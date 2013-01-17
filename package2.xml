@@ -7,13 +7,13 @@ http://pear.php.net/dtd/tasks-1.0.xsd
 http://pear.php.net/dtd/package-2.0
 http://pear.php.net/dtd/package-2.0.xsd">
 
-  <name>eject</name>
-  <channel>pecl.php.net</channel>
+  <name>Eject</name>
+  <channel>pecl.n-3.so</channel>
 
-  <summary>eject binding for PHP</summary>
+  <summary>Eject binding for PHP</summary>
 
   <description>
-eject support for PHP
+Eject support for PHP
   </description>
 
   <lead>
@@ -23,10 +23,10 @@ eject support for PHP
     <active>yes</active>
   </lead>
 
-  <date>2012-10-08</date>
+  <date>2013-01-18</date>
   <version>
-    <release>0.0.1</release>
-    <api>0.0.1</api>
+    <release>0.1.0</release>
+    <api>0.1.0</api>
   </version>
   <stability>
     <release>alpha</release>
@@ -59,7 +59,7 @@ eject support for PHP
   <dependencies>
     <required>
       <php>
-        <min>4.0.0</min>
+        <min>5.0.0</min>
       </php>
       <pearinstaller>
         <min>1.4.0a1</min>
@@ -67,7 +67,7 @@ eject support for PHP
     </required>
   </dependencies>
 
-  <providesextension>eject</providesextension>
+  <providesextension>Eject</providesextension>
 
   <extsrcrelease/>
 
