@@ -19,7 +19,7 @@
 #if HAVE_EJECT
 
 /* {{{ eject_functions[] */
-function_entry eject_functions[] = {
+zend_function_entry eject_functions[] = {
 	PHP_FE(eject_close_tray    , eject_close_tray_arg_info)
 	PHP_FE(eject_toggle_tray   , eject_toggle_tray_arg_info)
 	{ NULL, NULL, NULL }
