@@ -42,8 +42,13 @@ Unix-likeなOSでのビルド・インストール
     $ make test
     $ [sudo] make install
 
+インストールの後、以下の行を php.ini に追加してください。
+
+    extension=Eject.so
+
 
 Windows
 ---------------------
-現在対応していません。
-時間見つけて対応できたらいいなとは思っています。
+php_Eject.dll を、お使いの PHP の extension_dir にインストールし、以下の行を php.ini に追加してください。
+
+    extension=php_Eject.dll
