@@ -37,7 +37,7 @@ Unix-likeなOSでのビルド・インストール
 ---------------------
 
     $ phpize
-    $ ./configure [--enable--eject] 
+    $ ./configure [--enable-eject] 
     $ make
     $ make test
     $ [sudo] make install
